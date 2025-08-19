@@ -10,19 +10,29 @@ define( 'MWSTAKE_MEDIAWIKI_COMPONENT_WIRE_VERSION', '1.0.0' );
 
 MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 ->register( 'wire', static function () {
+	$GLOBALS['wgServiceWiringFiles'][] = __DIR__ . '/ServiceWiring.php';
+
 	$GLOBALS['mwsgWireServiceUrl'] = '';
+	$GLOBALS['mwsgWireServiceWebsocketUrl'] = '';
+	$GLOBALS['mwsgWireServiceAllowInsecureSSL'] = false;
+	$GLOBALS['mwsgWireServiceApiKey'] = '';
+	$GLOBALS['mwsgWireListeners'] = [];
 
 	$GLOBALS['wgExtensionFunctions'][] = static function () {
 		$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
 		$hookContainer->register( 'BeforePageDisplay', static function ( OutputPage $out ) {
 			$out->addModules( [ 'mwstake.component.wire' ] );
-			$out->addJsConfigVars( 'mwsgWikiServiceUrl', $GLOBALS['mwsgWireServiceUrl'] );
+			$out->addJsConfigVars( 'mwsgWireServiceWebsocketUrl', $GLOBALS['mwsgWireServiceWebsocketUrl'] );
 		} );
 	};
 
+	$restFilePath = wfRelativePath( __DIR__ . '/rest-routes.json', $GLOBALS['IP'] );
+	$GLOBALS['wgRestAPIAdditionalRouteFiles'][] = $restFilePath;
+
 	$GLOBALS['wgResourceModules']['mwstake.component.wire'] = [
 		'scripts' => [
-			'resources/bootstrap.js'
+			'resources/bootstrap.js',
+			'resources/message.js',
 		],
 		'dependencies' => [
 			'mwstake.component.tokenAuthenticator'
