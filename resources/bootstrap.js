@@ -90,9 +90,6 @@ mws.wire = {
 		return 'global';
 	},
 	getCurrentPageChannel: function() {
-		if ( !mw.config.get( 'wgIsArticle' ) && mw.config.get( 'wgNamespaceNumber' ) !== -1 ) {
-			throw new Error( 'Page channels only available for articles and special pages' );
-		}
 		const namespaceId = mw.config.get( 'wgNamespaceNumber' );
 		if ( namespaceId === -1 ) {
 			return 'special-' + mw.config.get( 'wgCanonicalSpecialPageName' );
@@ -112,7 +109,3 @@ mws.wire = {
 		return mws.wire._request( '/mws/v1/wire/send', wireMessage.toJSON() );
 	}
 };
-
-mws.wire.listen( mws.wire.getCurrentPageChannel(), function( payload ) {
-	mw.notify( payload );
-} );
