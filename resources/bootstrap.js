@@ -1,6 +1,6 @@
 mws = window.mws || {};
 mws.wire = {
-	_isInitialized: false,
+	_initialization: null,
 	_isOpen: false,
 	_subscriptions: {},
 	_url: mw.config.get( 'mwsgWireServiceWebsocketUrl' ),
@@ -34,7 +34,9 @@ mws.wire = {
 	},
 	_connect: async () => {
 		const dfd = $.Deferred();
-		mws.wire._isInitialized = true;
+		if ( mws.wire._initialization ) {
+			return mws.wire._initialization;
+		}
 		if ( !mws.wire._url ) {
 			return null;
 		}
@@ -67,6 +69,7 @@ mws.wire = {
 				mws.wire._isOpen = false;
 			}
 		} );
+		mws.wire._initialization = dfd.promise();
 		return dfd.promise();
 	},
 	listen: async function( channel, callback ) {
@@ -75,9 +78,7 @@ mws.wire = {
 		} catch ( e ) {
 			return;
 		}
-		if ( !mws.wire._isInitialized ) {
-			await mws.wire._connect();
-		}
+		await mws.wire._connect();
 		if ( !mws.wire._isOpen ) {
 			throw new Error( 'Wire connection cannot be opened' );
 		}
