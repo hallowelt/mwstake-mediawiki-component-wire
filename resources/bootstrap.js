@@ -41,9 +41,6 @@ mws.wire = {
 			return null;
 		}
 		mw.loader.using( 'mediawiki.user' ).then( async () => {
-			if ( mw.user.isAnon() ) {
-				return null;
-			}
 			const token = await mws.tokenAuthenticator.generateToken(true);
 			mws.wire.socket = new WebSocket(mws.wire._url + '?token=' + encodeURIComponent(token));
 			mws.wire.socket.onopen = () => {
