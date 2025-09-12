@@ -2,9 +2,10 @@
 
 namespace MWStake\MediaWiki\Component\Wire;
 
+use JsonSerializable;
 use MediaWiki\Message\Message;
 
-class WireMessage implements \JsonSerializable {
+class WireMessage implements JsonSerializable {
 
 	/**
 	 * Convenience method to create a new WireMessage from a MediaWiki Message object
@@ -49,7 +50,7 @@ class WireMessage implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'channel' => (string)$this->channel,
 			'payload' => $this->payload,
