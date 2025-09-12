@@ -1,7 +1,8 @@
 mws = window.mws || {};
 mws.wire = {
-	_initialization: null,
-	_isOpen: false,
+	_initializing: false,
+	_connectionTimer: null,
+	_reconnectTimer: null,
 	_subscriptions: {},
 	_url: mw.config.get( 'mwsgWireServiceWebsocketUrl' ),
 	_parseMessage: ( message ) => {
@@ -33,41 +34,68 @@ mws.wire = {
 		return dfd.promise();
 	},
 	_connect: async () => {
-		const dfd = $.Deferred();
-		if ( mws.wire._initialization ) {
-			return mws.wire._initialization;
+		if ( mws.wire._initialiting ) {
+			return;
 		}
+		mws.wire._initialiting = true;
 		if ( !mws.wire._url ) {
 			return null;
 		}
+		if ( mws.wire.socket ) {
+			return;
+		}
 		mw.loader.using( 'mediawiki.user' ).then( async () => {
-			const token = await mws.tokenAuthenticator.generateToken(true);
-			mws.wire.socket = new WebSocket(mws.wire._url + '?token=' + encodeURIComponent(token));
-			mws.wire.socket.onopen = () => {
-				console.debug( "Wire connection opened" );
-				mws.wire._isOpen = true;
-				dfd.resolve();
-			};
-			mws.wire.socket.onmessage = (event) => {
-				const wireMessage = mws.wire.Message.fromData( event.data );
-				console.debug( "Received wire message:", wireMessage.toJSON() );
-				const channel = wireMessage.channel;
-				const subscriptions = mws.wire._subscriptions[channel] || [];
-				for ( const callback of subscriptions ) {
-					try {
-						callback( wireMessage.payload );
-					} catch (e) {
-						console.error( "Error in wire message callback for channel:", channel, e ); //eslint-disable-line no-console
+			try {
+				const token = await mws.tokenAuthenticator.generateToken(true);
+				mws.wire.socket = new WebSocket(mws.wire._url + '?token=' + encodeURIComponent(token));
+				mws.wire._initialiting = false;
+				mws.wire._connectionTimer = setTimeout( () => {
+					mws.wire.socket.close();
+					mws.wire.socket = null;
+					mws.wire._reconnect();
+				}, 5000 );
+				mws.wire.socket.onopen = () => {
+					mws.wire._clearConnectionTimer();
+					console.debug( "Wire connection opened" );
+				};
+				mws.wire.socket.onmessage = (event) => {
+					const wireMessage = mws.wire.Message.fromData( event.data );
+					console.debug( "Received wire message:", wireMessage.toJSON() );
+					const channel = wireMessage.channel;
+					const subscriptions = mws.wire._subscriptions[channel] || [];
+					for ( const callback of subscriptions ) {
+						try {
+							callback( wireMessage.payload );
+						} catch (e) {
+							console.error( "Error in wire message callback for channel:", channel, e ); //eslint-disable-line no-console
+						}
 					}
+				};
+				mws.wire.socket.onclose = () => {
+					mws.wire.socket = null;
+					mws.wire._reconnect();
 				}
-			};
-			mws.wire.socket.onclose = () => {
-				console.debug( "Wire connection closed" );
-				mws.wire._isOpen = false;
+			} catch ( e ) {
+				console.error( "Error during wire connection initialization", e ); //eslint-disable-line no-console
 			}
 		} );
-		mws.wire._initialization = dfd.promise();
-		return dfd.promise();
+	},
+	_reconnect: () => {
+		mws.wire._clearConnectionTimer();
+		console.debug( "Wire connection lost/cannot connect, attempting to reconnect..." );
+		mws.wire._reconnectTimer = setTimeout( () => {
+			mws.wire._connect();
+		}, 1000 );
+	},
+	_clearConnectionTimer: () => {
+		if ( mws.wire._connectionTimer ) {
+			clearTimeout( mws.wire._connectionTimer );
+			mws.wire._connectionTimer = null;
+		}
+		if ( mws.wire._reconnectTimer ) {
+			clearTimeout( mws.wire._reconnectTimer );
+			mws.wire._reconnectTimer = null;
+		}
 	},
 	listen: async function( channel, callback ) {
 		try {
@@ -75,10 +103,7 @@ mws.wire = {
 		} catch ( e ) {
 			return;
 		}
-		await mws.wire._connect();
-		if ( !mws.wire._isOpen ) {
-			throw new Error( 'Wire connection cannot be opened' );
-		}
+		mws.wire._connect();
 		if ( !mws.wire._subscriptions[channel] ) {
 			mws.wire._subscriptions[channel] = [];
 		}
