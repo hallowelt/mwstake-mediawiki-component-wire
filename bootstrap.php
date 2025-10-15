@@ -12,11 +12,11 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 ->register( 'wire', static function () {
 	$GLOBALS['wgServiceWiringFiles'][] = __DIR__ . '/ServiceWiring.php';
 
-	$GLOBALS['mwsgWireServiceUrl'] = '';
-	$GLOBALS['mwsgWireServiceWebsocketUrl'] = '';
-	$GLOBALS['mwsgWireServiceAllowInsecureSSL'] = false;
-	$GLOBALS['mwsgWireServiceApiKey'] = '';
-	$GLOBALS['mwsgWireListeners'] = [];
+	$GLOBALS['mwsgWireServiceUrl'] = $GLOBALS['mwsgWireServiceUrl'] ?? '';
+	$GLOBALS['mwsgWireServiceWebsocketUrl'] = $GLOBALS['mwsgWireServiceWebsocketUrl'] ?? '';
+	$GLOBALS['mwsgWireServiceAllowInsecureSSL'] = $GLOBALS['mwsgWireServiceAllowInsecureSSL'] ?? false;
+	$GLOBALS['mwsgWireServiceApiKey'] = $GLOBALS['mwsgWireServiceApiKey'] ?? '';
+	$GLOBALS['mwsgWireListeners'] = $GLOBALS['mwsgWireListeners'] ?? [];
 
 	$GLOBALS['wgExtensionFunctions'][] = static function () {
 		$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
