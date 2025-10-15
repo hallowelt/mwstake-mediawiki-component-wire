@@ -13,7 +13,6 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 	$GLOBALS['wgServiceWiringFiles'][] = __DIR__ . '/ServiceWiring.php';
 
 	$GLOBALS['mwsgWireServiceUrl'] = $GLOBALS['mwsgWireServiceUrl'] ?? '';
-	$GLOBALS['mwsgWireServiceWebsocketUrl'] = $GLOBALS['mwsgWireServiceWebsocketUrl'] ?? '';
 	$GLOBALS['mwsgWireServiceAllowInsecureSSL'] = $GLOBALS['mwsgWireServiceAllowInsecureSSL'] ?? false;
 	$GLOBALS['mwsgWireServiceApiKey'] = $GLOBALS['mwsgWireServiceApiKey'] ?? '';
 	$GLOBALS['mwsgWireListeners'] = $GLOBALS['mwsgWireListeners'] ?? [];
@@ -22,7 +21,7 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 		$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
 		$hookContainer->register( 'BeforePageDisplay', static function ( OutputPage $out ) {
 			$out->addModules( [ 'mwstake.component.wire' ] );
-			$out->addJsConfigVars( 'mwsgWireServiceWebsocketUrl', $GLOBALS['mwsgWireServiceWebsocketUrl'] );
+			$out->addJsConfigVars( 'mwsgWireServiceUrl', $GLOBALS['mwsgWireServiceUrl'] );
 		} );
 	};
 

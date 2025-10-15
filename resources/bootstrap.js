@@ -4,7 +4,7 @@ mws.wire = {
 	_connectionTimer: null,
 	_reconnectTimer: null,
 	_subscriptions: {},
-	_url: mw.config.get( 'mwsgWireServiceWebsocketUrl' ),
+	_url: mw.config.get( 'mwsgWireServiceUrl' ),
 	_parseMessage: ( message ) => {
 		return mw.msg( ...message )
 	},
