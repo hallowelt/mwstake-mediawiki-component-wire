@@ -8,8 +8,7 @@ Same value must be configured on `webservice-wire` side (`TOKEN_SALT` env var)
 
 Url of `webservice-wire` service
 
-    $GLOBALS['mwsgWireServiceUrl'] = ''; // HTTPS url
-    $GLOBALS['mwsgWireServiceWebsocketUrl'] = ''; // WSS url
+    $GLOBALS['mwsgWireServiceUrl'] = '';
     $GLOBALS['mwsgWireServiceAllowInsecureSSL'] = false;
 
 API-key used for HTTP communication with `webservice-wire` service.

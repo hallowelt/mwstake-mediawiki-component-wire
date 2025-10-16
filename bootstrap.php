@@ -12,17 +12,16 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 ->register( 'wire', static function () {
 	$GLOBALS['wgServiceWiringFiles'][] = __DIR__ . '/ServiceWiring.php';
 
-	$GLOBALS['mwsgWireServiceUrl'] = '';
-	$GLOBALS['mwsgWireServiceWebsocketUrl'] = '';
-	$GLOBALS['mwsgWireServiceAllowInsecureSSL'] = false;
-	$GLOBALS['mwsgWireServiceApiKey'] = '';
-	$GLOBALS['mwsgWireListeners'] = [];
+	$GLOBALS['mwsgWireServiceUrl'] = $GLOBALS['mwsgWireServiceUrl'] ?? '';
+	$GLOBALS['mwsgWireServiceAllowInsecureSSL'] = $GLOBALS['mwsgWireServiceAllowInsecureSSL'] ?? false;
+	$GLOBALS['mwsgWireServiceApiKey'] = $GLOBALS['mwsgWireServiceApiKey'] ?? '';
+	$GLOBALS['mwsgWireListeners'] = $GLOBALS['mwsgWireListeners'] ?? [];
 
 	$GLOBALS['wgExtensionFunctions'][] = static function () {
 		$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
 		$hookContainer->register( 'BeforePageDisplay', static function ( OutputPage $out ) {
 			$out->addModules( [ 'mwstake.component.wire' ] );
-			$out->addJsConfigVars( 'mwsgWireServiceWebsocketUrl', $GLOBALS['mwsgWireServiceWebsocketUrl'] );
+			$out->addJsConfigVars( 'mwsgWireServiceUrl', $GLOBALS['mwsgWireServiceUrl'] );
 		} );
 	};
 
