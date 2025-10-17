@@ -3,17 +3,18 @@ mws.wire = {
 	_initializing: false,
 	_connectionTimer: null,
 	_reconnectTimer: null,
+	_subscriptionPermissions: {},
 	_subscriptions: {},
 	_url: mw.config.get( 'mwsgWireServiceWebsocketUrl' ),
 	_parseMessage: ( message ) => {
 		return mw.msg( ...message )
 	},
-	_checkCurrentUserCanSubscribe: async ( channel ) => {
+	_checkCurrentUserCanSubscribe: ( channel ) => {
 		return mws.wire._request( '/mws/v1/wire/check-can-subscribe', {
 			channel: channel
 		} );
 	},
-	_request: async ( path, data ) => {
+	_request: ( path, data ) => {
 		const dfd = $.Deferred();
 		$.ajax( {
 			url: mw.util.wikiScript( 'rest' ) + path,
@@ -97,17 +98,55 @@ mws.wire = {
 			mws.wire._reconnectTimer = null;
 		}
 	},
-	listen: async function( channel, callback ) {
-		try {
-			await mws.wire._checkCurrentUserCanSubscribe( channel );
-		} catch ( e ) {
-			return;
-		}
+	_subscribe: function( channel, callbacks ) {
+		console.log( "SUBBING", channel, callbacks );
 		mws.wire._connect();
 		if ( !mws.wire._subscriptions[channel] ) {
 			mws.wire._subscriptions[channel] = [];
 		}
-		this._subscriptions[channel].push( callback );
+		for ( let i = 0; i < callbacks.length; i++ ) {
+			const callback = callbacks[i];
+			if ( typeof callback !== 'function' ) {
+				continue;
+			}
+			this._subscriptions[channel].push( callback );
+		}
+	},
+	listen: async function( channel, callback ) {
+		if ( !channel || typeof callback !== 'function' ) {
+			return;
+		}
+		const user = mw.user.getName() || 'anonymous';
+		mws.wire._subscriptionPermissions[user] = mws.wire._subscriptionPermissions[user] || {};
+		mws.wire._subscriptionPermissions[user][channel] = mws.wire._subscriptionPermissions[user][channel] || {
+			allowed: null,
+			pendingCallbacks: [],
+			apiCall: null
+		};
+		if ( mws.wire._subscriptionPermissions[user][channel].allowed === false ) {
+			return;
+		}
+		if ( mws.wire._subscriptionPermissions[user][channel].allowed === true ) {
+			mws.wire._subscribe( channel, [ callback ] );
+			return;
+		}
+		mws.wire._subscriptionPermissions[user][channel].pendingCallbacks.push( callback );
+		if ( mws.wire._subscriptionPermissions[user][channel].apiCall === null ) {
+			mws.wire._subscriptionPermissions[user][channel].apiCall = mws.wire._checkCurrentUserCanSubscribe( channel )
+				.done( () => {
+					mws.wire._subscriptionPermissions[user][channel].allowed = true;
+					mws.wire._subscribe( channel, mws.wire._subscriptionPermissions[user][channel].pendingCallbacks );
+				} )
+				.fail( () => {
+					mws.wire._subscriptionPermissions[user][channel].allowed = false;
+
+				} )
+				.always( () =>  {
+					mws.wire._subscriptionPermissions[user][channel].pendingCallbacks = [];
+					mws.wire._subscriptionPermissions[user][channel].apiCall = null;
+				} );
+		}
+
 	},
 	getGlobalChannel: function() {
 		return 'global';
