@@ -99,7 +99,6 @@ mws.wire = {
 		}
 	},
 	_subscribe: function( channel, callbacks ) {
-		console.log( "SUBBING", channel, callbacks );
 		mws.wire._connect();
 		if ( !mws.wire._subscriptions[channel] ) {
 			mws.wire._subscriptions[channel] = [];
