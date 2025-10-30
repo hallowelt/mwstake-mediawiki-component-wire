@@ -1,3 +1,5 @@
+'use strict';
+
 mws.wire.Message = class WireMessage {
 	constructor( channel, payload = null ) {
 		this.channel = channel;

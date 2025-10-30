@@ -1,16 +1,14 @@
 {
 	"root": true,
 	"extends": [
-		"wikimedia/client",
-		"wikimedia/jquery",
-		"wikimedia/mediawiki"
+		"wikimedia/server",
+		"wikimedia/jquery"
 	],
-	"parserOptions": {
-		"sourceType": "commonjs",
-		"ecmaVersion": 2017
-	},
 	"globals": {
-		"mws": "writeable"
+		"mw": "readonly",
+		"mws": "writeable",
+		"WebSocket": "readonly",
+		"window": "readonly"
 	},
 	"rules": {
 		"es-x/no-async-functions": "off",

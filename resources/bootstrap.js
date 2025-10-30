@@ -1,3 +1,5 @@
+'use strict';
+
 /* eslint-disable no-underscore-dangle */
 mws = window.mws || {};
 mws.wire = {
@@ -7,7 +9,7 @@ mws.wire = {
 	_subscriptionPermissions: {},
 	_subscriptions: {},
 	_url: mw.config.get( 'mwsgWireServiceWebsocketUrl' ),
-	_parseMessage: ( message ) => mw.msg( ...message ), // eslint-disable-line mediawiki/msg-doc
+	_parseMessage: ( message ) => mw.msg( ...message ),
 	_checkCurrentUserCanSubscribe: ( channel ) => mws.wire._request( '/mws/v1/wire/check-can-subscribe', {
 		channel: channel
 	} ),
@@ -45,7 +47,7 @@ mws.wire = {
 		mw.loader.using( 'mediawiki.user' ).then( async () => {
 			try {
 				const token = await mws.tokenAuthenticator.generateToken( true );
-				mws.wire.socket = new WebSocket( mws.wire._url + '?token=' + encodeURIComponent( token ) );
+				mws.wire.socket = new WebSocket( mws.wire._url + '?token=' + encodeURIComponent( token ) ); // eslint-disable-line n/no-unsupported-features/node-builtins
 				mws.wire._initialiting = false;
 				mws.wire._connectionTimer = setTimeout( () => {
 					mws.wire.socket.close();
@@ -54,18 +56,18 @@ mws.wire = {
 				}, 5000 );
 				mws.wire.socket.onopen = () => {
 					mws.wire._clearConnectionTimer();
-					console.debug( 'Wire connection opened' ); // eslint-disable-line no-console
+					console.debug( 'Wire connection opened' );
 				};
 				mws.wire.socket.onmessage = ( event ) => {
 					const wireMessage = mws.wire.Message.fromData( event.data );
-					console.debug( 'Received wire message:', wireMessage.toJSON() ); // eslint-disable-line no-console
+					console.debug( 'Received wire message:', wireMessage.toJSON() );
 					const channel = wireMessage.channel;
 					const subscriptions = mws.wire._subscriptions[ channel ] || [];
 					for ( const callback of subscriptions ) {
 						try {
 							callback( wireMessage.payload );
 						} catch ( e ) {
-							console.error( 'Error in wire message callback for channel:', channel, e ); // eslint-disable-line no-console
+							console.error( 'Error in wire message callback for channel:', channel, e );
 						}
 					}
 				};
@@ -74,13 +76,13 @@ mws.wire = {
 					mws.wire._reconnect();
 				};
 			} catch ( e ) {
-				console.error( 'Error during wire connection initialization', e ); // eslint-disable-line no-console
+				console.error( 'Error during wire connection initialization', e );
 			}
 		} );
 	},
 	_reconnect: () => {
 		mws.wire._clearConnectionTimer();
-		console.debug( 'Wire connection lost/cannot connect, attempting to reconnect...' ); // eslint-disable-line no-console
+		console.debug( 'Wire connection lost/cannot connect, attempting to reconnect...' );
 		mws.wire._reconnectTimer = setTimeout( () => {
 			mws.wire._connect();
 		}, 1000 );
