@@ -20,4 +20,4 @@ mws.wire.Message = class WireMessage {
 		}
 		return new WireMessage( data.channel, data.payload );
 	}
-}
+};

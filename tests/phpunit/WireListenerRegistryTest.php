@@ -19,8 +19,8 @@ class WireListenerRegistryTest extends TestCase {
 	 * @param WireChannel $channel
 	 * @param int $expectedCount
 	 * @return void
-	 * @covers WireListenerRegistry::register
-	 * @covers WireListenerRegistry::getListeners
+	 * @covers \MWStake\MediaWiki\Component\Wire\WireListenerRegistry::register
+	 * @covers \MWStake\MediaWiki\Component\Wire\WireListenerRegistry::getListeners
 	 * @dataProvider provideListeners
 	 */
 	public function testGetListeners( WireListener $listener, WireChannel $channel, int $expectedCount ): void {
