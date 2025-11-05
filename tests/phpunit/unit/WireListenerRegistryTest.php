@@ -1,18 +1,18 @@
 <?php
 
-namespace MWStake\MediaWiki\Component\Wire\Tests;
+namespace MWStake\MediaWiki\Component\Wire\Tests\Unit;
 
 use MediaWiki\Page\PageIdentity;
+use MediaWikiUnitTestCase;
 use MWStake\MediaWiki\Component\Wire\Listener\WireListener;
 use MWStake\MediaWiki\Component\Wire\Listener\WireListenerOnPage;
 use MWStake\MediaWiki\Component\Wire\WireChannel;
 use MWStake\MediaWiki\Component\Wire\WireListenerRegistry;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \MWStake\MediaWiki\Component\Wire\WireListenerRegistry
  */
-class WireListenerRegistryTest extends TestCase {
+class WireListenerRegistryTest extends MediaWikiUnitTestCase {
 
 	/**
 	 * @param WireListener $listener

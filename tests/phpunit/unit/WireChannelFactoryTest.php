@@ -1,18 +1,18 @@
 <?php
 
-namespace MWStake\MediaWiki\Component\Wire\Tests;
+namespace MWStake\MediaWiki\Component\Wire\Tests\Unit;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\User\UserIdentity;
+use MediaWikiUnitTestCase;
 use MWStake\MediaWiki\Component\Wire\WireChannelFactory;
-use PHPUnit\Framework\TestCase;
 
 /**
  * For safe-guarding channel name convention
  * @covers \MWStake\MediaWiki\Component\Wire\WireChannelFactory
  */
-class WireChannelFactoryTest extends TestCase {
+class WireChannelFactoryTest extends MediaWikiUnitTestCase {
 
 	/**
 	 * @return void
