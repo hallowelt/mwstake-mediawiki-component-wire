@@ -56,11 +56,9 @@ mws.wire = {
 				}, 5000 );
 				mws.wire.socket.onopen = () => {
 					mws.wire._clearConnectionTimer();
-					console.debug( 'Wire connection opened' );
 				};
 				mws.wire.socket.onmessage = ( event ) => {
 					const wireMessage = mws.wire.Message.fromData( event.data );
-					console.debug( 'Received wire message:', wireMessage.toJSON() );
 					const channel = wireMessage.channel;
 					const subscriptions = mws.wire._subscriptions[ channel ] || [];
 					for ( const callback of subscriptions ) {
@@ -82,7 +80,6 @@ mws.wire = {
 	},
 	_reconnect: () => {
 		mws.wire._clearConnectionTimer();
-		console.debug( 'Wire connection lost/cannot connect, attempting to reconnect...' );
 		mws.wire._reconnectTimer = setTimeout( () => {
 			mws.wire._connect();
 		}, 1000 );
