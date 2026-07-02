@@ -37,14 +37,13 @@ class WireMessenger {
 	 * @return void
 	 */
 	private function sendToWire( WireMessage $message ) {
+		if ( defined( 'MW_PHPUNIT_TEST' ) && MW_PHPUNIT_TEST ) {
+			return;
+		}
+
 		$data = $message->jsonSerialize();
 		$data['_wiki'] = WikiMap::getCurrentWikiId();
 		$body = json_encode( $data );
-
-		if ( defined( 'MW_PHPUNIT_TEST' ) && MW_PHPUNIT_TEST ) {
-			$this->logger->debug( 'Skip wire message sending when running PHPUnit tests' );
-			return;
-		}
 
 		$url = $this->wireConfig->get( 'Url' );
 		if ( !$url ) {
