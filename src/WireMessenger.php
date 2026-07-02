@@ -42,7 +42,7 @@ class WireMessenger {
 		$body = json_encode( $data );
 
 		if ( defined( 'MW_PHPUNIT_TEST' ) && MW_PHPUNIT_TEST ) {
-			$this->logger->debug( 'Skip wire message sending when running unit tests' );
+			$this->logger->debug( 'Skip wire message sending when running PHPUnit tests' );
 			return;
 		}
 
