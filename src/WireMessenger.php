@@ -41,6 +41,11 @@ class WireMessenger {
 		$data['_wiki'] = WikiMap::getCurrentWikiId();
 		$body = json_encode( $data );
 
+		if ( defined( 'MW_PHPUNIT_TEST' ) && MW_PHPUNIT_TEST ) {
+			$this->logger->debug( 'Skip wire message sending when running unit tests' );
+			return;
+		}
+
 		$url = $this->wireConfig->get( 'Url' );
 		if ( !$url ) {
 			$this->logger->debug( 'Wire service URL is not configured' );
