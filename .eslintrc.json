@@ -1,9 +1,13 @@
 {
 	"root": true,
 	"extends": [
-		"wikimedia/server",
-		"wikimedia/jquery"
+		"wikimedia/client",
+		"wikimedia/jquery",
+		"wikimedia/mediawiki"
 	],
+	"parserOptions": {
+		"sourceType": "commonjs"
+	},
 	"globals": {
 		"mw": "readonly",
 		"mws": "writeable",
@@ -13,6 +17,7 @@
 	"rules": {
 		"es-x/no-async-functions": "off",
 		"max-len": "off",
-		"no-implicit-globals": "off"
+		"no-implicit-globals": "off",
+		"no-jquery/no-done-fail": "warn"
 	}
 }
